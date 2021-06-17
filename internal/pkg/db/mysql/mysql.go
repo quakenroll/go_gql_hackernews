@@ -30,11 +30,15 @@ func Migrate() {
 		log.Fatal(err)
 	}
 	driver, _ := mysql.WithInstance(Db, &mysql.Config{})
-	m, _ := migrate.NewWithDatabaseInstance(
+	m, merr := migrate.NewWithDatabaseInstance(
 		"file://internal/pkg/db/migrations/mysql",
-		"mysql",
+		"hackernews",
 		driver,
 	)
+	if merr != nil {
+		log.Fatal(merr)
+	}
+
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}

@@ -23,9 +23,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	database "quakenroll/go_gql_hackernews/internal/pkg/db/mysql"
+
+	"github.com/quakenroll/go_gql_hackernews/graph"
+	gqlgen_hackernews "github.com/quakenroll/go_gql_hackernews/graph/generated"
+	database "github.com/quakenroll/go_gql_hackernews/internal/pkg/db/mysql"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 )
 
@@ -41,8 +45,8 @@ func main() {
 
 	database.InitDB()
 	database.Migrate()
-	server := handler.GraphQL(hackernews.NewExecutableSchema(hackernews.Config{Resolvers: &hackernews.Resolver{}}))
-	router.Handle("/", handler.Playground("GraphQL playground", "/query"))
+	server := handler.NewDefaultServer(gqlgen_hackernews.NewExecutableSchema(gqlgen_hackernews.Config{Resolvers: &graph.Resolver{}}))
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", server)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

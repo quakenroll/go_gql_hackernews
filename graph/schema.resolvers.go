@@ -6,20 +6,20 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/quakenroll/go_gql_hackernews/graph/generated"
 	"github.com/quakenroll/go_gql_hackernews/graph/model"
+	"github.com/quakenroll/go_gql_hackernews/internal/links"
 )
 
 // mutationResolver 인터페이스의 구현
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	var link model.Link
-	var user model.User
-	link.Address = input.Address
+	var link links.Link
 	link.Title = input.Title
-	user.Name = "test"
-	link.User = &user
-	return &link, nil
+	link.Address = input.Address
+	linkID := link.Save()
+	return &model.Link{ID: strconv.FormatInt(linkID, 10), Title: link.Title, Address: link.Address}, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
@@ -35,17 +35,13 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 }
 
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	var links []*model.Link
-	dummyLink := &model.Link{
-		Title:   "dummy",
-		Address: "my address",
-		User: &model.User{
-			Name: "",
-		},
+	var resultLinks []*model.Link
+	var dbLinks []links.Link
+	dbLinks = links.GetAll()
+	for _, link := range dbLinks {
+		resultLinks = append(resultLinks, &model.Link{ID: link.ID, Title: link.Title, Address: link.Address})
 	}
-
-	links = append(links, dummyLink)
-	return links, nil
+	return resultLinks, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
