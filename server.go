@@ -34,7 +34,14 @@ import (
 	"github.com/go-chi/chi"
 )
 
-const defaultPort = "8080"
+/*
+google oauth2
+	client id : 1017766501798-6cq9t9iirccri93udjffg9s8a8esrn28.apps.googleusercontent.com
+	client pass : ayoClDJ9bgDFNbjKPq8TzOO9
+	port : 8081
+*/
+
+const defaultPort = "8081"
 
 func main() {
 	port := os.Getenv("PORT")
