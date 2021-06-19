@@ -26,6 +26,7 @@ import (
 
 	"github.com/quakenroll/go_gql_hackernews/graph"
 	gqlgen_hackernews "github.com/quakenroll/go_gql_hackernews/graph/generated"
+	"github.com/quakenroll/go_gql_hackernews/internal/auth"
 	database "github.com/quakenroll/go_gql_hackernews/internal/pkg/db/mysql"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -42,6 +43,7 @@ func main() {
 	}
 
 	router := chi.NewRouter()
+	router.Use(auth.Middleware()) // this sets the handler that should be processed before any normal handler's routines
 
 	database.InitDB()
 	database.Migrate()
@@ -51,4 +53,5 @@ func main() {
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
+
 }
