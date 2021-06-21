@@ -39,14 +39,6 @@ import (
 	"github.com/go-chi/chi"
 )
 
-/*
-google oauth2
-	ClientID : 1017766501798-6cq9t9iirccri93udjffg9s8a8esrn28.apps.googleusercontent.com
-	ClientSecret : ayoClDJ9bgDFNbjKPq8TzOO9
-	callback : http://localhost:8081/auth/google/callback
-	port : 8081
-*/
-
 const defaultPort = "8081"
 
 var googleOauthConfig = oauth2.Config{
