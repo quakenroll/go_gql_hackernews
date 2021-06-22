@@ -51,14 +51,28 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateLink   func(childComplexity int, input model.NewLink) int
-		CreateUser   func(childComplexity int, input model.NewUser) int
-		Login        func(childComplexity int, input model.Login) int
-		RefreshToken func(childComplexity int, input model.RefreshTokenInput) int
+		CreateLink        func(childComplexity int, input model.NewLink) int
+		CreateTest        func(childComplexity int, input model.NewTest) int
+		CreateTestSubInfo func(childComplexity int, input model.NewTestSubInfo) int
+		CreateUser        func(childComplexity int, input model.NewUser) int
+		Login             func(childComplexity int, input model.Login) int
+		RefreshToken      func(childComplexity int, input model.RefreshTokenInput) int
 	}
 
 	Query struct {
 		Links func(childComplexity int) int
+		Tests func(childComplexity int) int
+	}
+
+	Test struct {
+		ID   func(childComplexity int) int
+		Text func(childComplexity int) int
+	}
+
+	TestSubInfo struct {
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Test        func(childComplexity int) int
 	}
 
 	User struct {
@@ -68,6 +82,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
+	CreateTest(ctx context.Context, input model.NewTest) (string, error)
+	CreateTestSubInfo(ctx context.Context, input model.NewTestSubInfo) (string, error)
 	CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error)
 	CreateUser(ctx context.Context, input model.NewUser) (string, error)
 	Login(ctx context.Context, input model.Login) (string, error)
@@ -75,6 +91,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Links(ctx context.Context) ([]*model.Link, error)
+	Tests(ctx context.Context) ([]*model.Test, error)
 }
 
 type executableSchema struct {
@@ -132,6 +149,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateLink(childComplexity, args["input"].(model.NewLink)), true
 
+	case "Mutation.createTest":
+		if e.complexity.Mutation.CreateTest == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTest_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTest(childComplexity, args["input"].(model.NewTest)), true
+
+	case "Mutation.createTestSubInfo":
+		if e.complexity.Mutation.CreateTestSubInfo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTestSubInfo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTestSubInfo(childComplexity, args["input"].(model.NewTestSubInfo)), true
+
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
 			break
@@ -174,6 +215,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Links(childComplexity), true
+
+	case "Query.tests":
+		if e.complexity.Query.Tests == nil {
+			break
+		}
+
+		return e.complexity.Query.Tests(childComplexity), true
+
+	case "Test.id":
+		if e.complexity.Test.ID == nil {
+			break
+		}
+
+		return e.complexity.Test.ID(childComplexity), true
+
+	case "Test.text":
+		if e.complexity.Test.Text == nil {
+			break
+		}
+
+		return e.complexity.Test.Text(childComplexity), true
+
+	case "TestSubInfo.description":
+		if e.complexity.TestSubInfo.Description == nil {
+			break
+		}
+
+		return e.complexity.TestSubInfo.Description(childComplexity), true
+
+	case "TestSubInfo.id":
+		if e.complexity.TestSubInfo.ID == nil {
+			break
+		}
+
+		return e.complexity.TestSubInfo.ID(childComplexity), true
+
+	case "TestSubInfo.test":
+		if e.complexity.TestSubInfo.Test == nil {
+			break
+		}
+
+		return e.complexity.TestSubInfo.Test(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -263,6 +346,18 @@ type Link {
   user: User!
 }
 
+type Test {
+  id: ID!
+  text: String!
+}
+
+type TestSubInfo{
+  id: ID!
+  description: String!
+  test: Test!
+}
+
+
 type User {
   id: ID!
   name: String!
@@ -270,6 +365,15 @@ type User {
 
 type Query {
   links: [Link!]!
+  tests: [Test!]!
+}
+
+input NewTest {
+  text: String!
+}
+input NewTestSubInfo {
+  description: String!
+  testId: String!
 }
 
 input NewLink {
@@ -292,6 +396,8 @@ input Login {
 }
 
 type Mutation {
+  createTest(input: NewTest!): String!
+  createTestSubInfo(input: NewTestSubInfo!): String!
   createLink(input: NewLink!): Link!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
@@ -312,6 +418,36 @@ func (ec *executionContext) field_Mutation_createLink_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewLink2githubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐNewLink(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTestSubInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTestSubInfo
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTestSubInfo2githubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐNewTestSubInfo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTest_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTest
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTest2githubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐNewTest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -558,6 +694,90 @@ func (ec *executionContext) _Link_user(ctx context.Context, field graphql.Collec
 	return ec.marshalNUser2ᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_createTest(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createTest_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTest(rctx, args["input"].(model.NewTest))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createTestSubInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createTestSubInfo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTestSubInfo(rctx, args["input"].(model.NewTestSubInfo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createLink(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -761,6 +981,41 @@ func (ec *executionContext) _Query_links(ctx context.Context, field graphql.Coll
 	return ec.marshalNLink2ᚕᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐLinkᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_tests(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Tests(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Test)
+	fc.Result = res
+	return ec.marshalNTest2ᚕᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐTestᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -830,6 +1085,181 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Test_id(ctx context.Context, field graphql.CollectedField, obj *model.Test) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Test",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Test_text(ctx context.Context, field graphql.CollectedField, obj *model.Test) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Test",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Text, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TestSubInfo_id(ctx context.Context, field graphql.CollectedField, obj *model.TestSubInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TestSubInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TestSubInfo_description(ctx context.Context, field graphql.CollectedField, obj *model.TestSubInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TestSubInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TestSubInfo_test(ctx context.Context, field graphql.CollectedField, obj *model.TestSubInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TestSubInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Test, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Test)
+	fc.Result = res
+	return ec.marshalNTest2ᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐTest(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -2045,6 +2475,54 @@ func (ec *executionContext) unmarshalInputNewLink(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewTest(ctx context.Context, obj interface{}) (model.NewTest, error) {
+	var it model.NewTest
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "text":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
+			it.Text, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewTestSubInfo(ctx context.Context, obj interface{}) (model.NewTestSubInfo, error) {
+	var it model.NewTestSubInfo
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "testId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("testId"))
+			it.TestID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj interface{}) (model.NewUser, error) {
 	var it model.NewUser
 	var asMap = obj.(map[string]interface{})
@@ -2158,6 +2636,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "createTest":
+			out.Values[i] = ec._Mutation_createTest(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createTestSubInfo":
+			out.Values[i] = ec._Mutation_createTestSubInfo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createLink":
 			out.Values[i] = ec._Mutation_createLink(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -2218,10 +2706,93 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "tests":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tests(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var testImplementors = []string{"Test"}
+
+func (ec *executionContext) _Test(ctx context.Context, sel ast.SelectionSet, obj *model.Test) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, testImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Test")
+		case "id":
+			out.Values[i] = ec._Test_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "text":
+			out.Values[i] = ec._Test_text(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var testSubInfoImplementors = []string{"TestSubInfo"}
+
+func (ec *executionContext) _TestSubInfo(ctx context.Context, sel ast.SelectionSet, obj *model.TestSubInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, testSubInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TestSubInfo")
+		case "id":
+			out.Values[i] = ec._TestSubInfo_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._TestSubInfo_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "test":
+			out.Values[i] = ec._TestSubInfo_test(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2601,6 +3172,16 @@ func (ec *executionContext) unmarshalNNewLink2githubᚗcomᚋquakenrollᚋgo_gql
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewTest2githubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐNewTest(ctx context.Context, v interface{}) (model.NewTest, error) {
+	res, err := ec.unmarshalInputNewTest(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewTestSubInfo2githubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐNewTestSubInfo(ctx context.Context, v interface{}) (model.NewTestSubInfo, error) {
+	res, err := ec.unmarshalInputNewTestSubInfo(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐNewUser(ctx context.Context, v interface{}) (model.NewUser, error) {
 	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2624,6 +3205,53 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTest2ᚕᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐTestᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Test) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTest2ᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐTest(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNTest2ᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐTest(ctx context.Context, sel ast.SelectionSet, v *model.Test) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Test(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋquakenrollᚋgo_gql_hackernewsᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

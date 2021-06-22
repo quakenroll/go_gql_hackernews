@@ -16,7 +16,14 @@ import (
 	"github.com/quakenroll/go_gql_hackernews/pkg/jwt"
 )
 
-// mutationResolver 인터페이스의 구현
+func (r *mutationResolver) CreateTest(ctx context.Context, input model.NewTest) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) CreateTestSubInfo(ctx context.Context, input model.NewTestSubInfo) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
 	user := auth.ForContext(ctx)
 	if user == nil {
@@ -87,6 +94,10 @@ func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
 		resultLinks = append(resultLinks, &model.Link{ID: link.ID, Title: link.Title, Address: link.Address, User: grahpqlUser})
 	}
 	return resultLinks, nil
+}
+
+func (r *queryResolver) Tests(ctx context.Context) ([]*model.Test, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

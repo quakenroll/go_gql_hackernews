@@ -8,6 +8,18 @@ type Link {
   user: User!
 }
 
+type Test {
+  id: ID!
+  text: String!
+}
+
+type TestSubInfo{
+  id: ID!
+  description: String!
+  test: Test!
+}
+
+
 type User {
   id: ID!
   name: String!
@@ -15,6 +27,15 @@ type User {
 
 type Query {
   links: [Link!]!
+  tests: [Test!]!
+}
+
+input NewTest {
+  text: String!
+}
+input NewTestSubInfo {
+  description: String!
+  testId: String!
 }
 
 input NewLink {
@@ -37,6 +58,8 @@ input Login {
 }
 
 type Mutation {
+  createTest(input: NewTest!): String!
+  createTestSubInfo(input: NewTestSubInfo!): String!
   createLink(input: NewLink!): Link!
   createUser(input: NewUser!): String!
   login(input: Login!): String!
